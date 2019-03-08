@@ -2,5 +2,6 @@
 **/.vs/**
 **/*.vcxproj.*
 **/*.vcxproj
+**/*.db
 **/*.sln
 **/[Dd]ebug/
