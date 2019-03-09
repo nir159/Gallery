@@ -181,10 +181,16 @@ void MemoryAccess::createUser(User& user)
 
 void MemoryAccess::deleteUser(const User& user)
 {
+	std::list<Album> albums(m_albums);
 	if (doesUserExists(user.getId())) {
 	
 		for (auto iter = m_users.begin(); iter != m_users.end(); ++iter) {
-			if (*iter == user) {
+			if (user == *iter) {
+				for (const Album& album : albums) {
+					if (user.getId() == album.getOwnerId()) {//album && 
+						deleteAlbum(album.getName(), album.getOwnerId());
+					}
+				}
 				iter = m_users.erase(iter);
 				return;
 			}
