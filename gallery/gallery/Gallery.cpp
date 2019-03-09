@@ -6,6 +6,11 @@
 #include "MemoryAccess.h"
 #include "AlbumManager.h"
 
+void printTime() {
+	auto time = std::chrono::system_clock::now();
+	std::time_t currTime = std::chrono::system_clock::to_time_t(time);
+	std::cout << "Nir Yosef---" << std::ctime(&currTime);
+}
 
 int getCommandNumberFromUser()
 {
@@ -39,9 +44,7 @@ int main(void)
 	// initialize album manager
 	AlbumManager albumManager(dataAccess);
 
-	auto time = std::chrono::system_clock::now();
-	std::time_t currTime = std::chrono::system_clock::to_time_t(time);
-	std::cout << "Nir Yosef---" << std::ctime(&currTime);
+	printTime();
 
 	std::string albumName;
 	std::cout << "Welcome to Gallery!" << std::endl;
