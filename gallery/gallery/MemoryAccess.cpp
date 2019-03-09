@@ -187,7 +187,7 @@ void MemoryAccess::deleteUser(const User& user)
 		for (auto iter = m_users.begin(); iter != m_users.end(); ++iter) {
 			if (user == *iter) {
 				for (const Album& album : albums) {
-					if (user.getId() == album.getOwnerId()) {//album && 
+					if (user.getId() == album.getOwnerId()) {
 						deleteAlbum(album.getName(), album.getOwnerId());
 					}
 				}
