@@ -52,7 +52,7 @@ public:
 private:
 	std::list<Album> m_albums;
 	std::list<User> m_users;
-
+	
 	auto getAlbumIfExists(const std::string& albumName);
 
 	Album createDummyAlbum(const User& user);
