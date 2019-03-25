@@ -10,10 +10,6 @@ bool DatabaseAccess::execCommand(const char* sqlStatement) {
 	int res = sqlite3_exec(db, sqlStatement, nullptr, nullptr, errMessage);
 	if (res != SQLITE_OK)
 		return false;
-	execCommand("CREATE TABLE IF NOT EXISTS ALBUMS (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, USER_ID INTEGER NOT NULL, CREATION_DATE TEXT NOT NULL, FOREIGN KEY(USER_ID) REFERENCES USERS(ID)); ");
-	execCommand("CREATE TABLE IF NOT EXISTS PICTURES ( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, LOCATION TEXT NOT NULL, CREATION_DATE TEXT NOT NULL, ALBUM_ID INTEGER NOT NULL, FOREIGN KEY(ALBUM_ID ) REFERENCES ALBUMS(ID)); ");
-	execCommand("CREATE TABLE IF NOT EXISTS TAGS( PICTURE_ID INTEGER NOT NULL, USER_ID INTEGER NOT NULL, PRIMARY KEY(PICTURE_ID,USER_ID), FOREIGN KEY(PICTURE_ID ) REFERENCES PICTURES(ID), FOREIGN KEY(USER_ID ) REFERENCES USERS(ID)); ");
-	execCommand("CREATE TABLE IF NOT EXISTS USERS( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL); ");
 	return true;
 }
 
@@ -31,6 +27,10 @@ bool DatabaseAccess::open() {
 		db = nullptr;
 		return false;
 	}
+	execCommand("CREATE TABLE IF NOT EXISTS USERS( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL); ");
+	execCommand("CREATE TABLE IF NOT EXISTS ALBUMS (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, USER_ID INTEGER NOT NULL, CREATION_DATE TEXT NOT NULL, FOREIGN KEY(USER_ID) REFERENCES USERS(ID)); ");
+	execCommand("CREATE TABLE IF NOT EXISTS PICTURES ( ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, LOCATION TEXT NOT NULL, CREATION_DATE TEXT NOT NULL, ALBUM_ID INTEGER NOT NULL, FOREIGN KEY(ALBUM_ID ) REFERENCES ALBUMS(ID)); ");
+	execCommand("CREATE TABLE IF NOT EXISTS TAGS( PICTURE_ID INTEGER NOT NULL, USER_ID INTEGER NOT NULL, PRIMARY KEY(PICTURE_ID,USER_ID), FOREIGN KEY(PICTURE_ID ) REFERENCES PICTURES(ID), FOREIGN KEY(USER_ID ) REFERENCES USERS(ID)); ");
 	return true;
 }
 
@@ -52,4 +52,41 @@ void DatabaseAccess::clear() {
 void DatabaseAccess::closeAlbum(Album&)
 {
 	
+}
+
+void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture) {
+	std::string command = "INSERT INTO PICTURES VALUES (NULL, '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + albumName + ");"// albumName -> albumId
+	execCommand(command.c_str());
+}
+
+void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) {
+	std::string command = "DELETE FROM PICTURES WHERE NAME = '" + pictureName + "';";
+	execCommand(command.c_str());
+}
+
+void DatabaseAccess::tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) {
+
+}
+
+void DatabaseAccess::untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) {
+
+}
+
+void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId) {
+	std::string command = "DELETE FROM ALBUMS WHERE NAME = '" + albumName + "' AND USER_ID = " + std::to_string(userId) + ";";
+	execCommand(command.c_str());
+}
+
+void DatabaseAccess::createUser(User& user) {
+	std::string command = "INSERT INTO USERS VALUES (NULL, '" + user.getName() + "');";
+	execCommand(command.c_str());
+}
+
+void DatabaseAccess::deleteUser(const User& user) {
+	std::string command = "DELETE FROM USERS WHERE NAME = '" + user.getName() + "' AND ID = " + std::to_string(user.getId()) + ";";
+	execCommand(command.c_str());
+}
+
+float DatabaseAccess::averageTagsPerAlbumOfUser(const User& user) {
+
 }

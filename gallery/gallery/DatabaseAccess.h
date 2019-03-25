@@ -48,7 +48,7 @@ public:
 	std::list<Picture> getTaggedPicturesOfUser(const User& user) override;
 
 	bool open() override;
-	void close() override {};
+	void close() override;
 	void clear() override;
 
 private:
