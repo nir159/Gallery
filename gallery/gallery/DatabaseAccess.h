@@ -30,6 +30,7 @@ public:
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
 
 	// user related
+	const std::list<User> getUsers();
 	void printUsers() override;
 	void createUser(User& user) override;
 	void deleteUser(const User& user) override;
@@ -53,8 +54,8 @@ public:
 
 private:
 	sqlite3* db;
-
 	auto getAlbumIfExists(const std::string& albumName);
+	auto getPictureIfExists(const std::string& pictureName);
 
 	Album createDummyAlbum(const User& user);
 	void cleanUserData(const User& userId);

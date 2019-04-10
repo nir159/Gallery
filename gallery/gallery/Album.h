@@ -8,8 +8,11 @@ class Album
 {
 public:
     Album() = default;
-	Album(int ownerId, const std::string& name);
-	Album(int ownerId, const std::string& name, const std::string& creationTime);
+	Album(int id, int ownerId, const std::string& name);
+	Album(int id, int ownerId, const std::string& name, const std::string& creationTime);
+
+	int getId() const;
+	void setId(int id);
 
 	const std::string& getName() const;
 	void setName(const std::string& name);
@@ -38,6 +41,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& strOut, const Album& album);
 
 private:
+	int m_id;
     int m_ownerId { 0 };
 	std::string m_name;
 	std::string m_creationDate;

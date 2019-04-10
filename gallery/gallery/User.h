@@ -6,6 +6,7 @@ class User
 {
 public:
 	
+	User() = default;
 	User(int id, const std::string& name);
 
 	int getId() const;

@@ -1,7 +1,6 @@
 ﻿#include "User.h"
 #include <iomanip>
 
-
 User::User(int id, const std::string& name) : 
 	m_id(id), m_name(name)
 {
