@@ -255,9 +255,66 @@ int DatabaseAccess::countAlbumsTaggedOfUser(const User& user) {
 }
 
 int DatabaseAccess::countTagsOfUser(const User& user) {
+	int tagsCtr = 0;
+	getAlbums();
+	for (const auto& album : albums) {
+		const std::list<Picture>& pics = album.getPictures();
 
+		for (const auto& picture : pics) {
+			if (picture.isUserTagged(user)) {
+				tagsCtr++;
+			}
+		}
+	}
+
+	return tagsCtr;
 }
 
-User getTopTaggedUser() override;
-Picture getTopTaggedPicture() override;
-std::list<Picture> getTaggedPicturesOfUser(const User& user) override;
+User DatabaseAccess::getTopTaggedUser() {
+	getUsers();	
+	User mostTagged;
+	if (users.size() == NULL) {
+		throw MyException("There isn't any tagged user.");
+	}
+	for (const auto& user : users) {
+		if (countTagsOfUser(user) > countTagsOfUser(mostTagged)) {
+			mostTagged = user;
+		}
+	}
+	return mostTagged;
+}
+
+Picture DatabaseAccess::getTopTaggedPicture() {
+	getAlbums();
+	Picture mostTagged;
+	if (users.size() == NULL) {
+		throw MyException("There isn't any tagged user.");
+	}
+	for (const auto& album : albums) {
+		const std::list<Picture>& pics = album.getPictures();
+
+		for (const auto& picture : pics) {
+			if (picture.getTagsCount() > mostTagged.getTagsCount()) {
+				mostTagged = picture;
+			}
+		}
+	}
+
+	return mostTagged;
+}
+
+std::list<Picture> DatabaseAccess::getTaggedPicturesOfUser(const User& user) {
+	std::list<Picture> picturesTaggedOfUser;
+	getAlbums();
+	for (const auto& album : albums) {
+		const std::list<Picture>& pics = album.getPictures();
+
+		for (const auto& picture : pics) {
+			if (picture.isUserTagged(user)) {
+				picturesTaggedOfUser.push_back(picture);
+			}
+		}
+	}
+
+	return picturesTaggedOfUser;
+}
