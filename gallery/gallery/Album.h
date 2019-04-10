@@ -8,8 +8,8 @@ class Album
 {
 public:
     Album() = default;
-	Album(int id, int ownerId, const std::string& name);
-	Album(int id, int ownerId, const std::string& name, const std::string& creationTime);
+	Album(int ownerId, const std::string& name);
+	Album(int ownerId, const std::string& name, const std::string& creationTime);
 
 	int getId() const;
 	void setId(int id);

@@ -56,8 +56,6 @@ private:
 	sqlite3* db;
 	auto getAlbumIfExists(const std::string& albumName);
 	auto getPictureIfExists(const std::string& pictureName);
-
-	Album createDummyAlbum(const User& user);
 	void cleanUserData(const User& userId);
 	bool execCommand(const char* sqlStatement);
 };

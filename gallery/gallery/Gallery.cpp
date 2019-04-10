@@ -2,7 +2,7 @@
 #include <string>
 #include "MemoryAccess.h"
 #include "AlbumManager.h"
-
+#include "DataAccessTest.h"
 
 int getCommandNumberFromUser()
 {
@@ -30,6 +30,9 @@ int getCommandNumberFromUser()
 
 int main(void)
 {
+	DataAccessTest dat;
+	dat.initDb();
+	/*
 	// initialization data access
 	MemoryAccess dataAccess;
 
@@ -51,7 +54,7 @@ int main(void)
 			std::cout << e.what() << std::endl;
 		}
 	} 
-	while (true);
+	while (true);*/
 }
 
 
