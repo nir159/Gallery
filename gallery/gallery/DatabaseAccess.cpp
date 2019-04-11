@@ -153,16 +153,6 @@ bool DatabaseAccess::doesAlbumExists(const std::string& albumName, int userId) {
 	return false;
 }
 
-Album DatabaseAccess::openAlbum(const std::string& albumName) {
-	getAlbums();
-	for (const auto& album : albums) {
-		if (album.getName() == albumName) {
-			return album;
-		}
-	}
-	throw MyException("There isn't such album.");
-}
-
 void DatabaseAccess::printAlbums() {
 	getAlbums();
 	for (const auto& album : albums) {
@@ -434,4 +424,21 @@ void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId) {
 	execCommand(command.c_str());
 	command = "DELETE FROM ALBUMS WHERE NAME = '" + albumName + "';";
 	execCommand(command.c_str());
+}
+
+Album DatabaseAccess::openAlbum(const std::string& albumName) {
+	getAlbums();
+	getPictures();
+	for (const auto& album : albums) {
+		if (album.getName() == albumName) {
+			Album a = album;
+			for (const auto& pic : pics) {
+				if (pic.getAlbumId() == a.getId()) {
+					a.addPicture(pic);
+				}
+			}
+			return a;
+		}
+	}
+	throw MyException("There isn't such album.");
 }
