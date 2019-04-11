@@ -3,11 +3,10 @@
 #include <list>
 #include <memory>
 
-
 class Album
 {
 public:
-    Album() = default;
+    Album();
 	Album(int ownerId, const std::string& name);
 	Album(int ownerId, const std::string& name, const std::string& creationTime);
 

@@ -180,7 +180,7 @@ void AlbumManager::listPicturesInAlbum()
 	std::cout << "List of pictures in Album [" << m_openAlbum.getName() 
 			  << "] of user@" << m_openAlbum.getOwnerId() <<":" << std::endl;
 	
-	const std::list<Picture>& albumPictures = m_openAlbum.getPictures();
+	const std::list<Picture>& albumPictures = m_dataAccess.getPictures();
 	for (auto iter = albumPictures.begin(); iter != albumPictures.end(); ++iter) {
 		std::cout << "   + Picture [" << iter->getId() << "] - " << iter->getName() << 
 			"\tLocation: [" << iter->getPath() << "]\tCreation Date: [" <<

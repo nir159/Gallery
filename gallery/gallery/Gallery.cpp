@@ -30,13 +30,9 @@ int getCommandNumberFromUser()
 
 int main(void)
 {
-	DataAccessTest dat;
-	dat.initDb();
-	dat.removeUser();
-	/*
 	// initialization data access
-	MemoryAccess dataAccess;
-
+	DatabaseAccess dataAccess;
+	dataAccess.open();
 	// initialize album manager
 	AlbumManager albumManager(dataAccess);
 
@@ -55,7 +51,7 @@ int main(void)
 			std::cout << e.what() << std::endl;
 		}
 	} 
-	while (true);*/
+	while (true);
 }
 
 
