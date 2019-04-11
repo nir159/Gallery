@@ -4,6 +4,7 @@
 #include "MyException.h"
 #include "AlbumNotOpenException.h"
 
+#define ONE 1
 
 AlbumManager::AlbumManager(IDataAccess& dataAccess) :
     m_dataAccess(dataAccess), m_nextPictureId(100), m_nextUserId(200)
@@ -288,6 +289,12 @@ void AlbumManager::listUserTags()
 void AlbumManager::addUser()
 {
 	std::string name = getInputFromConsole("Enter user name: ");
+	// Initializing the existing user id
+	int increased = m_nextUserId+ONE;
+	while (m_dataAccess.doesUserExists(increased)) {
+		increased++;
+	}
+	m_nextUserId = increased - ONE;
 
 	User user(++m_nextUserId,name);
 	

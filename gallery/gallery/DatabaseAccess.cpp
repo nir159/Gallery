@@ -384,7 +384,7 @@ void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const
 				albumId = album.getId();
 			}
 		}
-		std::string command = "INSERT INTO PICTURES VALUES (" + std::to_string(picture.getId()) + ", '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + std::to_string(albumId) + ");";
+		std::string command = "INSERT INTO PICTURES VALUES (NULL, '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + std::to_string(albumId) + ");";
 		execCommand(command.c_str());
 	}
 }
