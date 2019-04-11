@@ -6,6 +6,8 @@
 
 std::list<Album> albums;// Used in the callback function
 std::list<User> users;
+std::list<Picture> pics;
+std::list<Picture> tags;
 
 // This function is used to run sqlite3 commands using cpp
 bool DatabaseAccess::execCommand(const char* sqlStatement) {
@@ -55,21 +57,20 @@ void DatabaseAccess::closeAlbum(Album&)
 }
 
 void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId) {
-
-	std::string command = "DELETE FROM ALBUMS WHERE NAME = '" + albumName + ";";
+	std::string command = "DELETE FROM ALBUMS WHERE NAME = '" + albumName + "';";
 	execCommand(command.c_str());
 }
 
 void DatabaseAccess::createUser(User& user) {
-	std::string command = "INSERT INTO USERS VALUES (NULL, '" + user.getName() + "');";
-	execCommand(command.c_str());
+	if (!doesUserExistsByName(user)) {
+		std::string command = "INSERT INTO USERS VALUES (NULL, '" + user.getName() + "');";
+		execCommand(command.c_str());
+	}
 }
 
 void DatabaseAccess::deleteUser(const User& user) {
-	if (doesUserExists(user.getId())) {
-		std::string command = "DELETE FROM USERS WHERE ID = " + std::to_string(user.getId()) + ";";
-		execCommand(command.c_str());
-	}
+	std::string command = "DELETE FROM USERS WHERE ID = " + std::to_string(user.getId()) + ";";
+	execCommand(command.c_str());
 }
 
 float DatabaseAccess::averageTagsPerAlbumOfUser(const User& user) {
@@ -104,7 +105,7 @@ int callbackAlbums(void *data, int argc, char **argv, char **azColName)
 
 const std::list<Album> DatabaseAccess::getAlbums() {
 	albums.clear();
-	char* sqlStatement = "SELECT * FROM PERSON;";
+	char* sqlStatement = "SELECT * FROM ALBUMS;";
 	char *errMessage = nullptr;
 	int res = sqlite3_exec(db, sqlStatement, callbackAlbums, nullptr, &errMessage);
 	return albums;
@@ -121,8 +122,10 @@ const std::list<Album> DatabaseAccess::getAlbumsOfUser(const User& user) {
 }
 
 void DatabaseAccess::createAlbum(const Album& album) {
-	std::string command = "INSERT INTO ALBUMS VALUES (NULL, '" + album.getName() + "', " + std::to_string(album.getOwnerId()) + ", '" + album.getCreationDate() + ");";
-	execCommand(command.c_str());
+	if (!doesAlbumExists(album.getName(), album.getOwnerId())) {
+		std::string command = "INSERT INTO ALBUMS VALUES (NULL, '" + album.getName() + "', " + std::to_string(album.getOwnerId()) + ", '" + album.getCreationDate() + "');";
+		execCommand(command.c_str());
+	}
 }
 
 bool DatabaseAccess::doesAlbumExists(const std::string& albumName, int userId) {
@@ -196,6 +199,16 @@ bool DatabaseAccess::doesUserExists(int userId) {
 	getUsers();
 	for (const auto& user : users) {
 		if (user.getId() == userId) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool DatabaseAccess::doesUserExistsByName(User check) {
+	getUsers();
+	for (const auto& user : users) {
+		if (user.getName() == check.getName()) {
 			return true;
 		}
 	}
@@ -306,26 +319,72 @@ auto DatabaseAccess::getAlbumIfExists(const std::string& albumName) {
 }
 
 auto DatabaseAccess::getPictureIfExists(const std::string& pictureName) {
-	getAlbums();
-	for (const auto& album : albums) {
-		const std::list<Picture>& pics = album.getPictures();
-		auto result = std::find_if(std::begin(pics), std::end(pics), [&](auto& pic) { return pic.getName() == pictureName; });
+	getPictures();
+	auto result = std::find_if(std::begin(pics), std::end(pics), [&](auto& pic) { return pic.getName() == pictureName; });
 
-		if (result != std::end(pics)) {
-			return result;
+	if (result == std::end(pics)) {
+		throw ItemNotFoundException("Picture not exists: ", pictureName);
+	}
+	return result;
+}
+
+int callbackPictures(void *data, int argc, char **argv, char **azColName)
+{
+	Picture pic;
+	for (int i = 0; i < argc; i++) {
+		if (std::string(azColName[i]) == "ID") {
+			pic.setId(atoi(argv[i]));
+		}
+		else if (std::string(azColName[i]) == "NAME") {
+			pic.setName(argv[i]);
+		}
+		else if (std::string(azColName[i]) == "LOCATION") {
+			pic.setPath(argv[i]);
+		}
+		else if (std::string(azColName[i]) == "CREATION_DATE") {
+			pic.setCreationDate(argv[i]);
+		}
+		else if (std::string(azColName[i]) == "ALBUM_ID") {
+			pic.setAlbumId(atoi(argv[i]));
 		}
 	}
-	throw ItemNotFoundException("Picture not exists: ", pictureName);
+	pics.push_back(pic);
+	return 0;
+}
+
+const std::list<Picture> DatabaseAccess::getPictures() {
+	pics.clear();
+	char* sqlStatement = "SELECT * FROM PICTURES;";
+	char *errMessage = nullptr;
+	int res = sqlite3_exec(db, sqlStatement, callbackPictures, nullptr, &errMessage);
+	return pics;
+}
+
+bool DatabaseAccess::doesPictureExists(std::string picture) {
+	getPictures();
+	for (const auto& pic : pics) {
+		if (pic.getName() == picture) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture) {
-	auto result = getAlbumIfExists(albumName);
-	std::string command = "INSERT INTO PICTURES VALUES (NULL, '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + std::to_string((*result).getOwnerId()) + ");";
-	execCommand(command.c_str());
+	if (!doesPictureExists(picture.getName())) {
+		auto result = getAlbumIfExists(albumName);
+		std::string command = "INSERT INTO PICTURES VALUES (NULL, '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + std::to_string((*result).getOwnerId()) + ");";
+		execCommand(command.c_str());
+	}
 }
 
 void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) {
 	auto result = getAlbumIfExists(albumName);
+	std::string command = "DELETE FROM PICTURES WHERE NAME = '" + pictureName + "';";
+	execCommand(command.c_str());
+}
+
+void DatabaseAccess::removePictureByName(const std::string& pictureName) {
 	std::string command = "DELETE FROM PICTURES WHERE NAME = '" + pictureName + "';";
 	execCommand(command.c_str());
 }

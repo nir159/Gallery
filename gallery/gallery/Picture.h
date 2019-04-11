@@ -18,6 +18,9 @@ public:
 	const std::string& getName() const;
 	void setName(const std::string& name);
 
+	void setAlbumId(const int id);
+	int getAlbumId() const;
+
 	const std::string& getPath() const;
 	void setPath(const std::string& location);
 
@@ -43,5 +46,6 @@ private:
 	std::string m_name;
 	std::string m_pathOnDisk;
 	std::string m_creationDate;
+	int albumId;
 	std::set<int> m_usersTags;
 };

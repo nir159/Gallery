@@ -26,6 +26,14 @@ void Picture::setId(int id)
 	m_pictureId = id;
 }
 
+void Picture::setAlbumId(const int id) {
+	albumId = id;
+}
+
+int Picture::getAlbumId() const {
+	return albumId;
+}
+
 const std::string& Picture::getName() const
 {
 	return m_name;

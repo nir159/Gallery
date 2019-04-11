@@ -24,10 +24,13 @@ public:
 	void printAlbums() override;
 
 	// picture related
+	bool doesPictureExists(std::string picture);
+	const std::list<Picture> getPictures();
 	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override;
 	void removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) override;
 	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
+	void removePictureByName(const std::string& pictureName);
 
 	// user related
 	const std::list<User> getUsers();
@@ -35,6 +38,7 @@ public:
 	void createUser(User& user) override;
 	void deleteUser(const User& user) override;
 	bool doesUserExists(int userId) override;
+	bool doesUserExistsByName(User user);
 	User getUser(int userId) override;
 
 	// user statistics

@@ -32,6 +32,7 @@ int main(void)
 {
 	DataAccessTest dat;
 	dat.initDb();
+	dat.addRows();
 	/*
 	// initialization data access
 	MemoryAccess dataAccess;

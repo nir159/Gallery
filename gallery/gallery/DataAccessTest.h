@@ -7,4 +7,5 @@ public:
 	DataAccessTest() = default;
 	~DataAccessTest();
 	void initDb();
+	void addRows();
 };
