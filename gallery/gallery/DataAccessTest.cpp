@@ -35,5 +35,8 @@ void DataAccessTest::addRows() {
 void DataAccessTest::updateRows() {
 	dbTest.addPictureToAlbumByName("aAlbum", Picture(i+AMOUNT, "myFemily"));
 	dbTest.updateName("myFemily", "myFamily");
+}
 
+void DataAccessTest::removeUser() {
+	dbTest.deleteUser(User(0, "Adam"));
 }

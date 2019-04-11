@@ -47,6 +47,10 @@ void DatabaseAccess::close() {
 
 // Function clears the information from database
 void DatabaseAccess::clear() {
+	execCommand("DROP TABLE USERS");
+	execCommand("DROP TABLE ALBUMS");
+	execCommand("DROP TABLE PICTURES");
+	execCommand("DROP TABLE TAGS");
 	//clears all the allocated memory
 }
 
@@ -54,11 +58,6 @@ void DatabaseAccess::clear() {
 void DatabaseAccess::closeAlbum(Album&)
 {
 	// Closes the album 
-}
-
-void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId) {
-	std::string command = "DELETE FROM ALBUMS WHERE NAME = '" + albumName + "';";
-	execCommand(command.c_str());
 }
 
 void DatabaseAccess::createUser(User& user) {
@@ -69,7 +68,30 @@ void DatabaseAccess::createUser(User& user) {
 }
 
 void DatabaseAccess::deleteUser(const User& user) {
-	std::string command = "DELETE FROM USERS WHERE ID = " + std::to_string(user.getId()) + ";";
+	std::list<int> deletedAlbums;
+	std::string command;
+	getUsers();
+	if (users.size() == NULL || !doesUserExistsByName(user)) {
+		throw MyException("User not found.");
+	}
+	for (const auto& us : users) {
+		if (user.getName() == us.getName()) {
+			command = "DELETE FROM TAGS WHERE USER_ID = " + std::to_string(us.getId()) + ";";
+			execCommand(command.c_str());
+		}
+	}
+	getAlbums();
+	for (const auto& album : albums) {
+		if (album.getOwnerId() == user.getId()) {
+			deletedAlbums.push_back(album.getId());
+			deleteAlbum(album.getName(), user.getId());
+		}
+	}
+	for (const int i : deletedAlbums) {
+		command = "DELETE FROM PICTURES WHERE ALBUM_ID = " + std::to_string(i) + ";";
+		execCommand(command.c_str());
+	}
+	command = "DELETE FROM USERS WHERE ID = " + std::to_string(user.getId()) + ";";
 	execCommand(command.c_str());
 }
 
@@ -405,4 +427,12 @@ void DatabaseAccess::updateName(const std::string& oldName, const std::string& n
 	if (doesPictureExists(oldName)) {
 		execCommand(("UPDATE PICTURES SET NAME = '" + newName + "' WHERE NAME = '" + oldName + "';").c_str());
 	}
+}
+
+void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId) {
+	auto result = getAlbumIfExists(albumName);
+	std::string command = "DELETE FROM PICTURES WHERE ALBUM_ID = " + std::to_string((*result).getId()) + ";";
+	execCommand(command.c_str());
+	command = "DELETE FROM ALBUMS WHERE NAME = '" + albumName + "';";
+	execCommand(command.c_str());
 }

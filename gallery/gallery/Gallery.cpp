@@ -32,7 +32,7 @@ int main(void)
 {
 	DataAccessTest dat;
 	dat.initDb();
-	dat.updateRows();
+	dat.removeUser();
 	/*
 	// initialization data access
 	MemoryAccess dataAccess;

@@ -9,4 +9,5 @@ public:
 	void initDb();
 	void addRows();
 	void updateRows();
+	void removeUser();
 };
