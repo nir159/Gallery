@@ -3,6 +3,8 @@
 #define AMOUNT 3
 #define END 5
 
+int i = 0;
+
 DataAccessTest::~DataAccessTest() {
 	dbTest.close();
 }
@@ -17,7 +19,6 @@ void DataAccessTest::addRows() {
 	std::string albums[AMOUNT] = { "aAlbum", "nAlbum", "iAlbum" };
 	std::string pictures[AMOUNT+AMOUNT] = { "pic1", "pic2", "pic3", "pic4", "pic5", "pic6" };
 	
-	int i = 0;
 	for (i = 0; i < AMOUNT; i++) {
 		dbTest.createUser(User(i, users[i]));// The id increases automaticlly
 		dbTest.createAlbum(Album(i, albums[i]));
@@ -29,4 +30,10 @@ void DataAccessTest::addRows() {
 			dbTest.tagUserInPicture(albums[i], pictures[END-i], u.getId());
 		}
 	}
+}
+
+void DataAccessTest::updateRows() {
+	dbTest.addPictureToAlbumByName("aAlbum", Picture(i+AMOUNT, "myFemily"));
+	dbTest.updateName("myFemily", "myFamily");
+
 }

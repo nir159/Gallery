@@ -8,4 +8,5 @@ public:
 	~DataAccessTest();
 	void initDb();
 	void addRows();
+	void updateRows();
 };

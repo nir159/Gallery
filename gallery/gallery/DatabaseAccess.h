@@ -31,6 +31,7 @@ public:
 	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
 	void removePictureByName(const std::string& pictureName);
+	void updateName(const std::string& oldName, const std::string& newName);
 
 	// user related
 	const std::list<User> getUsers();

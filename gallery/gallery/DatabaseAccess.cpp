@@ -400,3 +400,9 @@ void DatabaseAccess::untagUserInPicture(const std::string& albumName, const std:
 	std::string command = "DELETE FROM TAGS WHERE PICTURE_ID = " + std::to_string((*result).getId()) + ";";
 	execCommand(command.c_str());
 }
+
+void DatabaseAccess::updateName(const std::string& oldName, const std::string& newName) {
+	if (doesPictureExists(oldName)) {
+		execCommand(("UPDATE PICTURES SET NAME = '" + newName + "' WHERE NAME = '" + oldName + "';").c_str());
+	}
+}
