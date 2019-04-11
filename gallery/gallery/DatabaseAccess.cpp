@@ -47,10 +47,6 @@ void DatabaseAccess::close() {
 
 // Function clears the information from database
 void DatabaseAccess::clear() {
-	execCommand("DROP TABLE USERS");
-	execCommand("DROP TABLE ALBUMS");
-	execCommand("DROP TABLE PICTURES");
-	execCommand("DROP TABLE TAGS");
 	//clears all the allocated memory
 }
 
@@ -62,13 +58,12 @@ void DatabaseAccess::closeAlbum(Album&)
 
 void DatabaseAccess::createUser(User& user) {
 	if (!doesUserExistsByName(user)) {
-		std::string command = "INSERT INTO USERS VALUES (NULL, '" + user.getName() + "');";
+		std::string command = "INSERT INTO USERS VALUES (" + std::to_string(user.getId()) + ", '" + user.getName() + "');";
 		execCommand(command.c_str());
 	}
 }
 
 void DatabaseAccess::deleteUser(const User& user) {
-	std::list<int> deletedAlbums;
 	std::string command;
 	getUsers();
 	if (users.size() == NULL || !doesUserExistsByName(user)) {
@@ -83,13 +78,11 @@ void DatabaseAccess::deleteUser(const User& user) {
 	getAlbums();
 	for (const auto& album : albums) {
 		if (album.getOwnerId() == user.getId()) {
-			deletedAlbums.push_back(album.getId());
-			deleteAlbum(album.getName(), user.getId());
+			command = "DELETE FROM PICTURES WHERE ALBUM_ID = " + std::to_string(album.getId()) + ";";
+			execCommand(command.c_str());
+			command = "DELETE FROM ALBUMS WHERE ID = " + std::to_string(album.getId()) + ";";
+			execCommand(command.c_str());
 		}
-	}
-	for (const int i : deletedAlbums) {
-		command = "DELETE FROM PICTURES WHERE ALBUM_ID = " + std::to_string(i) + ";";
-		execCommand(command.c_str());
 	}
 	command = "DELETE FROM USERS WHERE ID = " + std::to_string(user.getId()) + ";";
 	execCommand(command.c_str());
@@ -296,22 +289,22 @@ User DatabaseAccess::getTopTaggedUser() {
 }
 
 Picture DatabaseAccess::getTopTaggedPicture() {
-	getAlbums();
-	Picture mostTagged;
-	if (users.size() == NULL) {
-		throw MyException("There isn't any tagged user.");
-	}
-	for (const auto& album : albums) {
-		const std::list<Picture>& pics = album.getPictures();
+getAlbums();
+Picture mostTagged;
+if (users.size() == NULL) {
+	throw MyException("There isn't any tagged user.");
+}
+for (const auto& album : albums) {
+	const std::list<Picture>& pics = album.getPictures();
 
-		for (const auto& picture : pics) {
-			if (picture.getTagsCount() > mostTagged.getTagsCount()) {
-				mostTagged = picture;
-			}
+	for (const auto& picture : pics) {
+		if (picture.getTagsCount() > mostTagged.getTagsCount()) {
+			mostTagged = picture;
 		}
 	}
+}
 
-	return mostTagged;
+return mostTagged;
 }
 
 std::list<Picture> DatabaseAccess::getTaggedPicturesOfUser(const User& user) {
@@ -393,9 +386,15 @@ bool DatabaseAccess::doesPictureExists(std::string picture) {
 }
 
 void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture) {
+	int albumId;
 	if (!doesPictureExists(picture.getName())) {
-		auto result = getAlbumIfExists(albumName);
-		std::string command = "INSERT INTO PICTURES VALUES (NULL, '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + std::to_string((*result).getOwnerId()) + ");";
+		getAlbums();
+		for (const auto& album : albums) {
+			if (album.getName() == albumName){
+				albumId = album.getId();
+			}
+		}
+		std::string command = "INSERT INTO PICTURES VALUES (" + std::to_string(picture.getId()) + ", '" + picture.getName() + "', '" + picture.getPath() + "', '" + picture.getCreationDate() + "', " + std::to_string(albumId) + ");";
 		execCommand(command.c_str());
 	}
 }
